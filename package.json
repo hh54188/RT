@@ -6,9 +6,10 @@
     "babel-preset-stage-1": "^6.5.0"
   },
   "dependencies": {
-    "webpack": "^1.13.1",
+    "blueimp-md5": "^2.3.0",
     "pubsub-js": "^1.5.3",
     "react": "^15.1.0",
-    "react-dom": "^15.1.0"
+    "react-dom": "^15.1.0",
+    "webpack": "^1.13.1"
   }
 }
