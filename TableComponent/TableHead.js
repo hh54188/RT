@@ -4,46 +4,42 @@ import SelectRowCheckbox from './SelectRowCheckbox';
 
 export default class TableHead extends React.Component {
 	render = () => {
-		const columnName = this.props.columnName || {};
-		const columnOrder = this.props.columnOrder;
-		const columnLength = this.props.columnLength;
-		const enableRowSelect = this.props.enableRowSelect;
-		const enableSort = this.props.enableSort;
-		const onSelectAll = this.props.onSelectAll;
-		let templates = this.props.templates;
+		let data = this.props.data;
 
-		let curTemplatesAreSelected = templates.every((item) => {
+		let curDataAreSelected = data.every((item) => {
 			return item.__selected == true;
 		});
 
-		// templates在空数组的情况下，every返回的结果默认为true
-		// 所以要通过判断templates长度修正这个问题
-		if (!templates.length) {
-			curTemplatesAreSelected = false;
+		// data在空数组的情况下，every返回的结果默认为true
+		// 所以要通过判断data长度修正这个问题
+		if (!data.length) {
+			curDataAreSelected = false;
 		}
 
-		let selectAllCheckboxRowCell = enableRowSelect
-									? <th className="one wide center aligned"><SelectRowCheckbox  checked={curTemplatesAreSelected} onChange={onSelectAll} /></th>
+		let selectAllCheckboxRowCell = this.props.enableRowSelect
+									? (<th className="one wide center aligned">
+										<SelectRowCheckbox  
+											checked={curDataAreSelected} 
+											changeHandler={this.props.selectBoxChnageHandler} 
+										/>
+									</th>)
 									: undefined;
 
 		const iconOfSort = <i className="sort icon"></i>;
 		const iconOfAscending = <i className="sort ascending icon"></i>;
 		const iconOfDescending = <i className="sort descending icon"></i>;
 
-		let sortHandler = this.props.onSort;
-		let sortStatus = this.props.sortStatus;
-		let sortConfig = this.props.sortConfig;
-
 		return (
 			<thead>
 				<tr>
 					{selectAllCheckboxRowCell}
 					{
-						columnOrder.map((propertyName, index) => {
+						this.props.columnOrder.map((propertyName, index) => {
 							// 如果有对应中文名，则取对应的中文名
 							// 如果没有中文名，则取属性英文名
 							// 如果有对于中文名，但中文名为undefined，则返回undefined
 							// 如果没有属性名，则返回undefined
+							let columnName = this.props.columnName;
 							let name = propertyName
 										? columnName[propertyName]
 											? columnName[propertyName]
@@ -53,7 +49,8 @@ export default class TableHead extends React.Component {
 										: undefined;
 							let sortIcon;
 
-							if (enableSort && name) {
+							if (this.props.enableSort && name) {
+								let sortStatus = this.props.sortStatus;
 								let sortStatusCode;
 
 								if (sortStatus['propertyName'] === propertyName) {
@@ -73,7 +70,7 @@ export default class TableHead extends React.Component {
 							}
 
 							return (
-								<th onClick={sortHandler.bind(null, propertyName)} key={index}>
+								<th onClick={this.props.sortHandler.bind(null, propertyName)} key={index}>
 									<span>{name}</span>
 									{sortIcon}
 								</th>
@@ -84,4 +81,26 @@ export default class TableHead extends React.Component {
 			</thead>
 		)
 	}
+}
+
+TableHead.propTypes = {
+	columnName: React.PropTypes.object,
+	columnOrder: React.PropTypes.array,
+	enableRowSelect: React.PropTypes.bool,
+	enableSort: React.PropTypes.bool,
+	data: React.PropTypes.array,
+	selectBoxChnageHandler: React.PropTypes.func,
+	sortHandler: React.PropTypes.func,
+	sortStatus: React.PropTypes.object
+}
+
+TableHead.defaultProps = {
+	columnName: {},
+	columnOrder: [],
+	enableRowSelect: false,
+	enableSort: false,
+	data: [],
+	selectBoxChnageHandler: new Function(),
+	sortHandler: new Function(),
+	sortStatus: {}
 }

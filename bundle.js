@@ -21281,6 +21281,10 @@
 		return Table;
 	}(_react2.default.Component);
 
+	// Table.propTypes = { initialCount: React.PropTypes.number };
+	// Table.defaultProps = { initialCount: 0 };
+
+
 	var _initialiseProps = function _initialiseProps() {
 		var _this2 = this;
 
@@ -22171,37 +22175,30 @@
 			}
 
 			return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(TableHead)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.render = function () {
-				var columnName = _this.props.columnName || {};
-				var columnOrder = _this.props.columnOrder;
-				var columnLength = _this.props.columnLength;
-				var enableRowSelect = _this.props.enableRowSelect;
-				var enableSort = _this.props.enableSort;
-				var onSelectAll = _this.props.onSelectAll;
-				var templates = _this.props.templates;
+				var data = _this.props.data;
 
-				var curTemplatesAreSelected = templates.every(function (item) {
+				var curDataAreSelected = data.every(function (item) {
 					return item.__selected == true;
 				});
 
-				// templates在空数组的情况下，every返回的结果默认为true
-				// 所以要通过判断templates长度修正这个问题
-				if (!templates.length) {
-					curTemplatesAreSelected = false;
+				// data在空数组的情况下，every返回的结果默认为true
+				// 所以要通过判断data长度修正这个问题
+				if (!data.length) {
+					curDataAreSelected = false;
 				}
 
-				var selectAllCheckboxRowCell = enableRowSelect ? _react2.default.createElement(
+				var selectAllCheckboxRowCell = _this.props.enableRowSelect ? _react2.default.createElement(
 					'th',
 					{ className: 'one wide center aligned' },
-					_react2.default.createElement(_SelectRowCheckbox2.default, { checked: curTemplatesAreSelected, onChange: onSelectAll })
+					_react2.default.createElement(_SelectRowCheckbox2.default, {
+						checked: curDataAreSelected,
+						changeHandler: _this.props.selectBoxChnageHandler
+					})
 				) : undefined;
 
 				var iconOfSort = _react2.default.createElement('i', { className: 'sort icon' });
 				var iconOfAscending = _react2.default.createElement('i', { className: 'sort ascending icon' });
 				var iconOfDescending = _react2.default.createElement('i', { className: 'sort descending icon' });
-
-				var sortHandler = _this.props.onSort;
-				var sortStatus = _this.props.sortStatus;
-				var sortConfig = _this.props.sortConfig;
 
 				return _react2.default.createElement(
 					'thead',
@@ -22210,15 +22207,17 @@
 						'tr',
 						null,
 						selectAllCheckboxRowCell,
-						columnOrder.map(function (propertyName, index) {
+						_this.props.columnOrder.map(function (propertyName, index) {
 							// 如果有对应中文名，则取对应的中文名
 							// 如果没有中文名，则取属性英文名
 							// 如果有对于中文名，但中文名为undefined，则返回undefined
 							// 如果没有属性名，则返回undefined
+							var columnName = _this.props.columnName;
 							var name = propertyName ? columnName[propertyName] ? columnName[propertyName] : columnName[propertyName] == undefined ? undefined : propertyName : undefined;
 							var sortIcon = void 0;
 
-							if (enableSort && name) {
+							if (_this.props.enableSort && name) {
+								var sortStatus = _this.props.sortStatus;
 								var sortStatusCode = void 0;
 
 								if (sortStatus['propertyName'] === propertyName) {
@@ -22241,7 +22240,7 @@
 
 							return _react2.default.createElement(
 								'th',
-								{ onClick: sortHandler.bind(null, propertyName), key: index },
+								{ onClick: _this.props.sortHandler.bind(null, propertyName), key: index },
 								_react2.default.createElement(
 									'span',
 									null,
@@ -22259,6 +22258,29 @@
 	}(_react2.default.Component);
 
 	exports.default = TableHead;
+
+
+	TableHead.propTypes = {
+		columnName: _react2.default.PropTypes.object,
+		columnOrder: _react2.default.PropTypes.array,
+		enableRowSelect: _react2.default.PropTypes.bool,
+		enableSort: _react2.default.PropTypes.bool,
+		data: _react2.default.PropTypes.array,
+		selectBoxChnageHandler: _react2.default.PropTypes.func,
+		sortHandler: _react2.default.PropTypes.func,
+		sortStatus: _react2.default.PropTypes.object
+	};
+
+	TableHead.defaultProps = {
+		columnName: {},
+		columnOrder: [],
+		enableRowSelect: false,
+		enableSort: false,
+		data: [],
+		selectBoxChnageHandler: new Function(),
+		sortHandler: new Function(),
+		sortStatus: {}
+	};
 
 /***/ },
 /* 176 */
@@ -22297,12 +22319,11 @@
 			}
 
 			return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(SelectRowCheckbox)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.render = function () {
-				var onChangeHandler = _this.props.onChange;
 				return _react2.default.createElement(
 					"div",
 					{ className: "ui checkbox" },
-					_react2.default.createElement("input", { checked: _this.props.checked, onChange: onChangeHandler, type: "checkbox", name: "checkbox-select-row" }),
-					_react2.default.createElement("label", { htmlFor: "checkbox-select-row" })
+					_react2.default.createElement("input", { checked: _this.props.checked, onChange: _this.props.changeHandler, type: "checkbox" }),
+					_react2.default.createElement("label", null)
 				);
 			}, _temp), _possibleConstructorReturn(_this, _ret);
 		}
@@ -22311,6 +22332,17 @@
 	}(_react2.default.Component);
 
 	exports.default = SelectRowCheckbox;
+
+
+	SelectRowCheckbox.propTypes = {
+		checked: _react2.default.PropTypes.bool,
+		changeHandler: _react2.default.PropTypes.func
+	};
+
+	SelectRowCheckbox.defaultProps = {
+		checked: false,
+		changeHandler: new Function()
+	};
 
 /***/ },
 /* 177 */

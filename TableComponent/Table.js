@@ -328,3 +328,6 @@ export default class Table extends React.Component {
 		)
 	}
 }
+
+// Table.propTypes = { initialCount: React.PropTypes.number };
+// Table.defaultProps = { initialCount: 0 };
