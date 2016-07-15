@@ -4,7 +4,7 @@ export default class TableBodyCell extends React.Component {
 	render = () => {
 		const replaceComponent = this.props.replaceComponent;
 		const helperFn = this.props.helperFunction;
-		const content = helperFn
+		let content = helperFn
 						? helperFn(this.props.content)
 						: this.props.content;
 
@@ -19,4 +19,14 @@ export default class TableBodyCell extends React.Component {
 		)
 	}
 
+}
+
+TableBodyCell.propTypes = {
+	replaceComponent: React.PropTypes.element,
+	helperFunction: React.PropTypes.func,
+	content: React.PropTypes.oneOfType([
+    	React.PropTypes.string,
+    	React.PropTypes.number,
+    	React.PropTypes.bool
+	]).isRequired
 }

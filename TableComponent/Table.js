@@ -6,9 +6,10 @@ import TableHead from './TableHead';
 import TableBody from './TableBody';
 import TableFoot from './TableFoot';
 
+import * as util from './utility';
+
 export default class Table extends React.Component {
 	constructor(props){
-		
 		super(props);
 
 		let singleSourceOfTruth = this.decorator(this.props.data);
@@ -19,22 +20,30 @@ export default class Table extends React.Component {
 		let curPage = 1;
 
 		this.state = {
-			__templates: singleSourceOfTruth.slice(),
-			templates: singleSourceOfTruth,
+			__data: singleSourceOfTruth.slice(),
+			data: singleSourceOfTruth,
 			paginationConfig: {
 				displayCountPerPage: displayCountPerPage,
 				curPage: curPage,
 				totalPage: totalPage				
 			},
 			filterConfig: {
-				keyword: '',
-				property: {}
+				keyword: ''
 			},
 			sortStatus: {
 				propertyName: '',
 				status: undefined
 			}
 		}
+		
+		PubSub.subscribe(this.props.updateTemplatesEventName, (eventName, templates) => {
+			this.setState({
+				__templates: templates,
+				templates: templates
+			});
+
+			this.updateTemplates();
+		});
 
 		PubSub.subscribe(this.props.keywordChangeEventName, (eventName, keyword) => {
 			let filterConfig = this.state.filterConfig;
@@ -43,28 +52,26 @@ export default class Table extends React.Component {
 				filterConfig: filterConfig
 			});
 
-			this.updateTemplates();
+			this.updateData();
 		});
 	}
-	updateTemplates = () => {
-		let templates = this.state.__templates;
+	updateData = () => {
+		let data = this.state.__data;
 
-		templates = this.getTemplatesByKeyword(templates);
-		templates = this.getTemplatesBySort(templates);
-		this.updatePaginationByTemplates(templates);
+		data = this.getDataByKeyword(data);
+		data = this.getDataBySort(data);
+		this.updatePaginationByData(data);
 
 		this.setState({
-			templates: templates
+			data: data
 		});
 	}
-	updatePaginationByTemplates = (templates) => {
+	updatePaginationByData = (data) => {
 
-		let templatesLength = templates.length;
-
+		let dataLength = data.length;
 		let paginationConfig = this.state.paginationConfig;
-		let displayCountPerPage = paginationConfig.displayCountPerPage;
 
-		paginationConfig.totalPage = Math.ceil(templatesLength / displayCountPerPage);
+		paginationConfig.totalPage = Math.ceil(dataLength / paginationConfig.displayCountPerPage);
 		paginationConfig.curPage = 1;
 
 		this.setState({
@@ -72,25 +79,25 @@ export default class Table extends React.Component {
 		})
 
 	}
-	getTemplatesBySort = (templates) => {
+	getDataBySort = (data) => {
 
 		let sortStatus = this.state.sortStatus;
 		let propertyName = sortStatus['propertyName'];
 		let status = sortStatus['status'];
 
 		if (!propertyName) {
-			return templates;
+			return data;
 		}
 		
 		switch (status % 3) {
-			case 0: templates = this.ascendingSortByPropery(templates, propertyName); break;
-			case 1: templates = this.descendingSortByPropery(templates, propertyName); break;
-			case 2: templates = templates;
+			case 0: data = this.ascendingSortByPropery(data, propertyName); break;
+			case 1: data = this.descendingSortByPropery(data, propertyName); break;
+			case 2: data = data;
 		}
 
-		return templates;
+		return data;
 	}
-	goNextPage = () => {
+	pageNextHandler = () => {
 
 		let paginationConfig = this.state.paginationConfig;
 		let curPage = paginationConfig.curPage;
@@ -102,7 +109,7 @@ export default class Table extends React.Component {
 			paginationConfig: paginationConfig
 		});
 	}
-	goPrevPage = () => {
+	pagePrevHandler = () => {
 
 		let paginationConfig = this.state.paginationConfig;
 		let curPage = paginationConfig.curPage;
@@ -114,7 +121,7 @@ export default class Table extends React.Component {
 			paginationConfig: paginationConfig
 		});
 	}
-	goPage = (num) => {
+	pageByNumberHandler = (num) => {
 		let paginationConfig = this.state.paginationConfig;
 		paginationConfig.curPage = num;
 
@@ -132,61 +139,6 @@ export default class Table extends React.Component {
 			return item;
 		});
 	}
-	ascendingSortByPropery = (templates, propertyName) => {
-		let propertyVal = templates[0][propertyName];
-		let propertyValType = typeof propertyVal;
-
-		switch (propertyValType) {
-			case 'string': templates = this.ascendingSortOfString(templates, propertyName); break;
-			case 'number': templates = this.ascendingSortOfNumber(templates, propertyName); break;		
-			case 'boolean': templates = this.ascendingSortOfBoolean(templates, propertyName); break;
-		}
-
-		return templates;
-	}
-	descendingSortByPropery = (templates, propertyName) => {
-		
-		let propertyVal = templates[0][propertyName];
-		let propertyValType = typeof propertyVal;
-
-		switch (propertyValType) {
-			case 'string': templates = this.descendingSortOfString(templates, propertyName); break;
-			case 'number': templates = this.descendingSortOfNumber(templates, propertyName); break;
-			case 'boolean': templates = this.descendingSortOfBoolean(templates, propertyName); break;
-		}
-
-		return templates;
-	}
-	cancelSort = () => {
-		return this.state.templates;
-	}
-	ascendingSortOfBoolean = () => {
-
-	}
-	descendingSortOfBoolean = () => {
-
-	}
-	ascendingSortOfString = (data, propertyName) => {
-		return data.sort(function (first, second) {
-			return first[propertyName].localeCompare(second[propertyName]);
-		});
-	}
-	descendingSortOfString = (data, propertyName) => {
-		return data.sort(function (first, second) {
-			return second[propertyName].localeCompare(first[propertyName]);
-		});
-	}
-	ascendingSortOfNumber = (data, propertyName) => {
-		return data.sort(function (first, second) {
-			return first[propertyName] - second[propertyName];
-
-		});
-	}
-	descendingSortOfNumber = (data, propertyName) => {
-		return data.sort(function (first, second) {
-			return second[propertyName] - first[propertyName];			
-		});
-	}			
 	sortByProperty = (propertyName) => {
 
 		let sortStatus = this.state.sortStatus;
@@ -203,9 +155,9 @@ export default class Table extends React.Component {
 			sortStatus: sortStatus
 		})
 
-		this.updateTemplates();
+		this.updateData();
 	}
-	toggleSelectItem = (item, eventObj) => {
+	toggleSelectItem = (item) => {
 		item.__selected = !item.__selected
 		this.setState({
 			data: this.updateItem(item)
@@ -213,29 +165,31 @@ export default class Table extends React.Component {
 	}
 	toggleSelectAllItem = (eventObj) => {
 		let selectVal = eventObj.target.checked;
-		let templates = this.state.templates;
-		templates.forEach(function (item) {
+		let data = this.state.data;
+
+		data.forEach(function (item) {
 			item.__selected = selectVal
 		});
+
 		this.setState({
-			templates: templates
+			data: data
 		});		
 	}
 	updateItem = (item) => {
-		let templates = this.state.templates;
-		for (let i = 0; i < templates.length; i++) {
-			if (templates[i].__index === item.__index) {
-				templates[i] = item;
+		let data = this.state.data;
+		for (let i = 0; i < data.length; i++) {
+			if (data[i].__index === item.__index) {
+				data[i] = item;
 				break;
 			}
 		}
-		return templates;
+		return data;
 	}
 	computedColumnLength = () => {
 		const columnOrder = this.props.config.columnOrder || [];
 		return columnOrder.length;
 	}
-	getTemplatesByKeyword = (templates) => {
+	getDataByKeyword = (data) => {
 		let filterConfig = this.state.filterConfig;
 		let keyword = filterConfig.keyword;
 
@@ -257,11 +211,11 @@ export default class Table extends React.Component {
 			return pass;
 		}
 
-		templates = templates.filter((tpl) => {
+		data = data.filter((tpl) => {
 			return checkTplHaveKeyword(tpl, keyword);
 		});
 
-		return templates;
+		return data;
 	}
 	render = () => {
 		// Important:
@@ -285,7 +239,7 @@ export default class Table extends React.Component {
 
 		let tableHead = displayHead
 						? <TableHead
-							templates={this.state.templates}
+							data={this.state.data}
 							sortStatus={this.state.sortStatus}
 							onSort={this.sortByProperty}
 							sortConfig={sortConfig}
@@ -310,17 +264,16 @@ export default class Table extends React.Component {
 						: undefined;
 
 		return (
-			<table style={tableStyle} className="ui celled table">
+			<table className="ui celled table">
 				{tableHead}
 				<TableBody
 					displayCountPerPage={this.state.paginationConfig.displayCountPerPage}
 					curPage={this.state.paginationConfig.curPage}
-					data={this.state.templates}
+					data={this.state.data}
 					bodyCellHelperFunction={bodyCellHelperFunction}
 					columnOrder={columnOrder}
 					enableRowSelect={enableRowSelect}
 					bodyCellReplacement={bodyCellReplacement}
-					tableStyle={tableStyle}
 					onSelectItem={this.toggleSelectItem}
 				/>
 				{tableFoot}

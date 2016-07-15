@@ -21197,8 +21197,6 @@
 		value: true
 	});
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
@@ -21222,6 +21220,12 @@
 	var _TableFoot = __webpack_require__(180);
 
 	var _TableFoot2 = _interopRequireDefault(_TableFoot);
+
+	var _utility = __webpack_require__(182);
+
+	var util = _interopRequireWildcard(_utility);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -21249,16 +21253,15 @@
 			var curPage = 1;
 
 			_this.state = {
-				__templates: singleSourceOfTruth.slice(),
-				templates: singleSourceOfTruth,
+				__data: singleSourceOfTruth.slice(),
+				data: singleSourceOfTruth,
 				paginationConfig: {
 					displayCountPerPage: displayCountPerPage,
 					curPage: curPage,
 					totalPage: totalPage
 				},
 				filterConfig: {
-					keyword: '',
-					property: {}
+					keyword: ''
 				},
 				sortStatus: {
 					propertyName: '',
@@ -21273,7 +21276,7 @@
 					filterConfig: filterConfig
 				});
 
-				_this.updateTemplates();
+				_this.updateData();
 			});
 			return _this;
 		}
@@ -21288,26 +21291,24 @@
 	var _initialiseProps = function _initialiseProps() {
 		var _this2 = this;
 
-		this.updateTemplates = function () {
-			var templates = _this2.state.__templates;
+		this.updateData = function () {
+			var data = _this2.state.__data;
 
-			templates = _this2.getTemplatesByKeyword(templates);
-			templates = _this2.getTemplatesBySort(templates);
-			_this2.updatePaginationByTemplates(templates);
+			data = _this2.getDataByKeyword(data);
+			data = _this2.getDataBySort(data);
+			_this2.updatePaginationByData(data);
 
 			_this2.setState({
-				templates: templates
+				data: data
 			});
 		};
 
-		this.updatePaginationByTemplates = function (templates) {
+		this.updatePaginationByData = function (data) {
 
-			var templatesLength = templates.length;
-
+			var dataLength = data.length;
 			var paginationConfig = _this2.state.paginationConfig;
-			var displayCountPerPage = paginationConfig.displayCountPerPage;
 
-			paginationConfig.totalPage = Math.ceil(templatesLength / displayCountPerPage);
+			paginationConfig.totalPage = Math.ceil(dataLength / paginationConfig.displayCountPerPage);
 			paginationConfig.curPage = 1;
 
 			_this2.setState({
@@ -21315,29 +21316,29 @@
 			});
 		};
 
-		this.getTemplatesBySort = function (templates) {
+		this.getDataBySort = function (data) {
 
 			var sortStatus = _this2.state.sortStatus;
 			var propertyName = sortStatus['propertyName'];
 			var status = sortStatus['status'];
 
 			if (!propertyName) {
-				return templates;
+				return data;
 			}
 
 			switch (status % 3) {
 				case 0:
-					templates = _this2.ascendingSortByPropery(templates, propertyName);break;
+					data = _this2.ascendingSortByPropery(data, propertyName);break;
 				case 1:
-					templates = _this2.descendingSortByPropery(templates, propertyName);break;
+					data = _this2.descendingSortByPropery(data, propertyName);break;
 				case 2:
-					templates = templates;
+					data = data;
 			}
 
-			return templates;
+			return data;
 		};
 
-		this.goNextPage = function () {
+		this.pageNextHandler = function () {
 
 			var paginationConfig = _this2.state.paginationConfig;
 			var curPage = paginationConfig.curPage;
@@ -21350,7 +21351,7 @@
 			});
 		};
 
-		this.goPrevPage = function () {
+		this.pagePrevHandler = function () {
 
 			var paginationConfig = _this2.state.paginationConfig;
 			var curPage = paginationConfig.curPage;
@@ -21363,7 +21364,7 @@
 			});
 		};
 
-		this.goPage = function (num) {
+		this.pageByNumberHandler = function (num) {
 			var paginationConfig = _this2.state.paginationConfig;
 			paginationConfig.curPage = num;
 
@@ -21384,71 +21385,6 @@
 			});
 		};
 
-		this.ascendingSortByPropery = function (templates, propertyName) {
-			var propertyVal = templates[0][propertyName];
-			var propertyValType = typeof propertyVal === 'undefined' ? 'undefined' : _typeof(propertyVal);
-
-			switch (propertyValType) {
-				case 'string':
-					templates = _this2.ascendingSortOfString(templates, propertyName);break;
-				case 'number':
-					templates = _this2.ascendingSortOfNumber(templates, propertyName);break;
-				case 'boolean':
-					templates = _this2.ascendingSortOfBoolean(templates, propertyName);break;
-			}
-
-			return templates;
-		};
-
-		this.descendingSortByPropery = function (templates, propertyName) {
-
-			var propertyVal = templates[0][propertyName];
-			var propertyValType = typeof propertyVal === 'undefined' ? 'undefined' : _typeof(propertyVal);
-
-			switch (propertyValType) {
-				case 'string':
-					templates = _this2.descendingSortOfString(templates, propertyName);break;
-				case 'number':
-					templates = _this2.descendingSortOfNumber(templates, propertyName);break;
-				case 'boolean':
-					templates = _this2.descendingSortOfBoolean(templates, propertyName);break;
-			}
-
-			return templates;
-		};
-
-		this.cancelSort = function () {
-			return _this2.state.templates;
-		};
-
-		this.ascendingSortOfBoolean = function () {};
-
-		this.descendingSortOfBoolean = function () {};
-
-		this.ascendingSortOfString = function (data, propertyName) {
-			return data.sort(function (first, second) {
-				return first[propertyName].localeCompare(second[propertyName]);
-			});
-		};
-
-		this.descendingSortOfString = function (data, propertyName) {
-			return data.sort(function (first, second) {
-				return second[propertyName].localeCompare(first[propertyName]);
-			});
-		};
-
-		this.ascendingSortOfNumber = function (data, propertyName) {
-			return data.sort(function (first, second) {
-				return first[propertyName] - second[propertyName];
-			});
-		};
-
-		this.descendingSortOfNumber = function (data, propertyName) {
-			return data.sort(function (first, second) {
-				return second[propertyName] - first[propertyName];
-			});
-		};
-
 		this.sortByProperty = function (propertyName) {
 
 			var sortStatus = _this2.state.sortStatus;
@@ -21465,10 +21401,10 @@
 				sortStatus: sortStatus
 			});
 
-			_this2.updateTemplates();
+			_this2.updateData();
 		};
 
-		this.toggleSelectItem = function (item, eventObj) {
+		this.toggleSelectItem = function (item) {
 			item.__selected = !item.__selected;
 			_this2.setState({
 				data: _this2.updateItem(item)
@@ -21477,24 +21413,26 @@
 
 		this.toggleSelectAllItem = function (eventObj) {
 			var selectVal = eventObj.target.checked;
-			var templates = _this2.state.templates;
-			templates.forEach(function (item) {
+			var data = _this2.state.data;
+
+			data.forEach(function (item) {
 				item.__selected = selectVal;
 			});
+
 			_this2.setState({
-				templates: templates
+				data: data
 			});
 		};
 
 		this.updateItem = function (item) {
-			var templates = _this2.state.templates;
-			for (var i = 0; i < templates.length; i++) {
-				if (templates[i].__index === item.__index) {
-					templates[i] = item;
+			var data = _this2.state.data;
+			for (var i = 0; i < data.length; i++) {
+				if (data[i].__index === item.__index) {
+					data[i] = item;
 					break;
 				}
 			}
-			return templates;
+			return data;
 		};
 
 		this.computedColumnLength = function () {
@@ -21502,7 +21440,7 @@
 			return columnOrder.length;
 		};
 
-		this.getTemplatesByKeyword = function (templates) {
+		this.getDataByKeyword = function (data) {
 			var filterConfig = _this2.state.filterConfig;
 			var keyword = filterConfig.keyword;
 
@@ -21522,11 +21460,11 @@
 				return pass;
 			};
 
-			templates = templates.filter(function (tpl) {
+			data = data.filter(function (tpl) {
 				return checkTplHaveKeyword(tpl, keyword);
 			});
 
-			return templates;
+			return data;
 		};
 
 		this.render = function () {
@@ -21550,7 +21488,7 @@
 			var tableStyle = config.tableStyle;
 
 			var tableHead = displayHead ? _react2.default.createElement(_TableHead2.default, {
-				templates: _this2.state.templates,
+				data: _this2.state.data,
 				sortStatus: _this2.state.sortStatus,
 				onSort: _this2.sortByProperty,
 				sortConfig: sortConfig,
@@ -21578,7 +21516,7 @@
 				_react2.default.createElement(_TableBody2.default, {
 					displayCountPerPage: _this2.state.paginationConfig.displayCountPerPage,
 					curPage: _this2.state.paginationConfig.curPage,
-					data: _this2.state.templates,
+					data: _this2.state.data,
 					bodyCellHelperFunction: bodyCellHelperFunction,
 					columnOrder: columnOrder,
 					enableRowSelect: enableRowSelect,
@@ -22386,11 +22324,6 @@
 
 			return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(TableBody)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.render = function () {
 				var data = _this.props.data;
-				var columnOrder = _this.props.columnOrder;
-				var enableRowSelect = _this.props.enableRowSelect;
-				var bodyCellReplacement = _this.props.bodyCellReplacement;
-				var bodyCellHelperFunction = _this.props.bodyCellHelperFunction;
-				var onSelectItem = _this.props.onSelectItem;
 
 				var displayCountPerPage = _this.props.displayCountPerPage;
 				var curPage = _this.props.curPage;
@@ -22401,12 +22334,12 @@
 					data.slice((curPage - 1) * displayCountPerPage, curPage * displayCountPerPage).map(function (item, index) {
 						return _react2.default.createElement(_TableBodyRow2.default, {
 							key: index,
-							columnOrder: columnOrder,
-							enableRowSelect: enableRowSelect,
+							columnOrder: _this.props.columnOrder,
+							enableRowSelect: _this.props.enableRowSelect,
 							item: item,
-							bodyCellReplacement: bodyCellReplacement,
-							bodyCellHelperFunction: bodyCellHelperFunction,
-							onSelectItem: onSelectItem
+							bodyCellReplacement: _this.props.bodyCellReplacement,
+							bodyCellHelperFunction: _this.props.bodyCellHelperFunction,
+							selectBoxChangeHandler: _this.props.selectBoxChangeHandler
 						});
 					})
 				);
@@ -22417,6 +22350,18 @@
 	}(_react2.default.Component);
 
 	exports.default = TableBody;
+
+
+	TableBody.propTypes = {
+		columnOrder: _react2.default.PropTypes.array.isRequired,
+		data: _react2.default.PropTypes.array.isRequired,
+		enableRowSelect: _react2.default.PropTypes.bool,
+		bodyCellReplacement: _react2.default.PropTypes.element,
+		bodyCellHelperFunction: _react2.default.PropTypes.func,
+		selectBoxChangeHandler: _react2.default.PropTypes.func,
+		curPage: _react2.default.PropTypes.number,
+		displayCountPerPage: _react2.default.PropTypes.number
+	};
 
 /***/ },
 /* 178 */
@@ -22464,17 +22409,15 @@
 
 			return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(TableBodyRow)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.render = function () {
 				var item = _this.props.item;
-				var columnOrder = _this.props.columnOrder || [];
 				var enableRowSelect = _this.props.enableRowSelect;
 				var bodyCellReplacement = _this.props.bodyCellReplacement;
 				var bodyCellHelperFunction = _this.props.bodyCellHelperFunction;
-				var onSelectItem = _this.props.onSelectItem;
 				var isSelected = item.__selected;
 
-				var selectRowCheckboxRowCell = enableRowSelect ? _react2.default.createElement(
+				var selectRowCheckboxRowCell = _this.props.enableRowSelect ? _react2.default.createElement(
 					'td',
 					{ className: 'center aligned' },
-					_react2.default.createElement(_SelectRowCheckbox2.default, { checked: isSelected, onChange: onSelectItem.bind(null, item) })
+					_react2.default.createElement(_SelectRowCheckbox2.default, { checked: isSelected, changeHandler: _this.props.selectBoxChangeHandler.bind(null, item) })
 				) : undefined;
 				var selectedBodyRowClassName = item['__selected'] ? 'positive' : '';
 
@@ -22482,7 +22425,7 @@
 					'tr',
 					{ className: selectedBodyRowClassName },
 					selectRowCheckboxRowCell,
-					columnOrder.map(function (property, index) {
+					_this.props.columnOrder.map(function (property, index) {
 						var replacement = [];
 						if (bodyCellReplacement) {
 							replacement = bodyCellReplacement.filter(function (replacement, index) {
@@ -22518,6 +22461,16 @@
 	}(_react2.default.Component);
 
 	exports.default = TableBodyRow;
+
+
+	TableBodyRow.propTypes = {
+		item: _react2.default.PropTypes.object.isRequired,
+		columnOrder: _react2.default.PropTypes.array.isRequired,
+		enableRowSelect: _react2.default.PropTypes.bool,
+		bodyCellReplacement: _react2.default.PropTypes.element,
+		bodyCellHelperFunction: _react2.default.PropTypes.func,
+		selectBoxChangeHandler: _react2.default.PropTypes.func
+	};
 
 /***/ },
 /* 179 */
@@ -22576,6 +22529,13 @@
 	}(_react2.default.Component);
 
 	exports.default = TableBodyCell;
+
+
+	TableBodyCell.propTypes = {
+		replaceComponent: _react2.default.PropTypes.element,
+		helperFunction: _react2.default.PropTypes.func,
+		content: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.string, _react2.default.PropTypes.number, _react2.default.PropTypes.bool]).isRequired
+	};
 
 /***/ },
 /* 180 */
@@ -22928,6 +22888,79 @@
 		totalPage: 1,
 		pagePrevHandler: new Function()
 	}, _defineProperty(_Pagination$defaultPr, 'pagePrevHandler', new Function()), _defineProperty(_Pagination$defaultPr, 'pageByNumberHandler', new Function()), _Pagination$defaultPr);
+
+/***/ },
+/* 182 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+	var ascendingSortOfBoolean = function ascendingSortOfBoolean(data, propertyName) {
+		return data.sort(function (first, second) {
+			return first[propertyName].toSting().localeCompare(second[propertyName].toSting());
+		});
+	};
+	var descendingSortOfBoolean = function descendingSortOfBoolean() {
+		return data.sort(function (first, second) {
+			return first[propertyName].toSting().localeCompare(second[propertyName].toSting());
+		});
+	};
+	var ascendingSortOfString = function ascendingSortOfString(data, propertyName) {
+		return data.sort(function (first, second) {
+			return first[propertyName].localeCompare(second[propertyName]);
+		});
+	};
+	var descendingSortOfString = function descendingSortOfString(data, propertyName) {
+		return data.sort(function (first, second) {
+			return second[propertyName].localeCompare(first[propertyName]);
+		});
+	};
+	var ascendingSortOfNumber = function ascendingSortOfNumber(data, propertyName) {
+		return data.sort(function (first, second) {
+			return first[propertyName] - second[propertyName];
+		});
+	};
+	var descendingSortOfNumber = function descendingSortOfNumber(data, propertyName) {
+		return data.sort(function (first, second) {
+			return second[propertyName] - first[propertyName];
+		});
+	};
+
+	exports.ascendingSortByPropery = function (data, propertyName) {
+
+		var propertyVal = data[0][propertyName];
+		var propertyValType = typeof propertyVal === 'undefined' ? 'undefined' : _typeof(propertyVal);
+
+		switch (propertyValType) {
+			case 'string':
+				data = ascendingSortOfString(data, propertyName);break;
+			case 'number':
+				data = ascendingSortOfNumber(data, propertyName);break;
+			case 'boolean':
+				data = ascendingSortOfBoolean(data, propertyName);break;
+		}
+
+		return data;
+	};
+
+	exports.descendingSortByPropery = function (data, propertyName) {
+
+		var propertyVal = data[0][propertyName];
+		var propertyValType = typeof propertyVal === 'undefined' ? 'undefined' : _typeof(propertyVal);
+
+		switch (propertyValType) {
+			case 'string':
+				data = descendingSortOfString(data, propertyName);break;
+			case 'number':
+				data = descendingSortOfNumber(data, propertyName);break;
+			case 'boolean':
+				data = descendingSortOfBoolean(data, propertyName);break;
+		}
+
+		return data;
+	};
 
 /***/ }
 /******/ ]);

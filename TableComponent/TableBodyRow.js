@@ -6,16 +6,14 @@ import TableBodyCell from './TableBodyCell';
 export default class TableBodyRow extends React.Component {
 	render = () => {
 		const item = this.props.item;
-		const columnOrder = this.props.columnOrder || [];
 		const enableRowSelect = this.props.enableRowSelect;
 		const bodyCellReplacement = this.props.bodyCellReplacement;
 		const bodyCellHelperFunction = this.props.bodyCellHelperFunction;
-		const onSelectItem = this.props.onSelectItem;
 		const isSelected = item.__selected;
 
-		let selectRowCheckboxRowCell = enableRowSelect
+		let selectRowCheckboxRowCell = this.props.enableRowSelect
 									? (<td className="center aligned">
-										<SelectRowCheckbox checked={isSelected}  onChange={onSelectItem.bind(null, item)}  />
+										<SelectRowCheckbox checked={isSelected}  changeHandler={this.props.selectBoxChangeHandler.bind(null, item)}  />
 									</td>)
 									: undefined;
 		let selectedBodyRowClassName = item['__selected']? 'positive': '';
@@ -24,7 +22,7 @@ export default class TableBodyRow extends React.Component {
 			<tr className={selectedBodyRowClassName}>
 			{selectRowCheckboxRowCell}
 			{
-				columnOrder.map((property, index) => {
+				this.props.columnOrder.map((property, index) => {
 					let replacement = [];
 					if (bodyCellReplacement) {
 						replacement = bodyCellReplacement.filter((replacement, index) => {
@@ -64,4 +62,13 @@ export default class TableBodyRow extends React.Component {
 			</tr>
 		)
 	}
+}
+
+TableBodyRow.propTypes = {
+	item: React.PropTypes.object.isRequired,
+	columnOrder: React.PropTypes.array.isRequired,
+	enableRowSelect: React.PropTypes.bool,
+	bodyCellReplacement: React.PropTypes.element,
+	bodyCellHelperFunction: React.PropTypes.func,
+	selectBoxChangeHandler: React.PropTypes.func
 }
