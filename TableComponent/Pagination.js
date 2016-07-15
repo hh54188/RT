@@ -10,22 +10,19 @@ class PaginationEllipsis extends React.Component {
 
 class PaginationNumber extends React.Component {
 	render = () => {
-		const number = this.props.number;
-		const active = this.props.active;
 		const defaultClassName = 'item';
-		let className = active? (defaultClassName + ' active'): defaultClassName;
+		let className = this.props.active? (defaultClassName + ' active'): defaultClassName;
 
 		return (
-		    <a onClick={this.props.onClick} className={className}>{number}</a>
+		    <a onClick={this.props.onClick} className={className}>{this.proprs.number}</a>
 		)
 	}
 }
 
 class PaginationPrevBtn extends React.Component {
 	render = ()=> {
-		const disabled = this.props.disabled;
 		const defaultClassName = 'icon item';
-		let className = defaultClassName + (disabled? ' disabled': '');
+		let className = defaultClassName + (this.props.disabled? ' disabled': '');
 
 		return (
 	        <a onClick={this.props.onClick} className={className}>
@@ -37,9 +34,8 @@ class PaginationPrevBtn extends React.Component {
 
 class PaginationNextBtn extends React.Component {
 	render = () => {
-		const disabled = this.props.disabled;
-		let className = 'icon item' + (disabled? ' disabled': '');	
-			return (
+		let className = 'icon item' + (this.props.disabled? ' disabled': '');	
+		return (
 	        <a onClick={this.props.onClick} className={className}>
 	          <i className="right chevron icon"></i>
 	        </a>
@@ -57,35 +53,35 @@ export default class Pagination extends React.Component {
 	}
 	render = ()=> {
 		
-		const curPage = this.props.curPage;
-		const totalPage = this.props.totalPage;
-		const maxPaginationCount = 7;
-		const lastPage = totalPage;
+		let curPage = this.props.curPage;
+		let totalPage = this.props.totalPage;
+		let maxPaginationItemCount = 7;
+		let lastPage = totalPage;
 		let paginationContent;
 
 		let disablePrevBtn = curPage === 1? true: false;
 		let dsiableNextBtn = curPage === lastPage? true: false;
 
-		let goNextPage = this.props.goNextPage;
-		let goPrevPage = this.props.goPrevPage;
-		let goPage = this.props.goPage;
+		let pageNextHandler = this.props.pageNextHandler;
+		let pagePrevHandler = this.props.pagePrevHandler;
+		let pageByNumberHandler = this.props.pageByNumberHandler;
 
 		const renderPageArr = (pageArr) => {
   			return pageArr.map((page) => {
-  				return <PaginationNumber onClick={goPage.bind(null, page)} key={page} number={page} active={page==curPage}/>
+  				return <PaginationNumber onClick={pageByNumberHandler.bind(null, page)} key={page} number={page} active={page==curPage}/>
   			})			
 		}
 
 
 		// 当页数小于等于7时，显示所有页数按钮
 		// 1,2,3,4,5,6,7
-		if (totalPage <= maxPaginationCount) {
+		if (totalPage <= maxPaginationItemCount) {
 			let pageArr = this.initPageArr(1, totalPage);
 			paginationContent = (
 				<div className="ui floated right pagination menu small">
-		      		<PaginationPrevBtn onClick={goPrevPage} disabled={disablePrevBtn}/>
+		      		<PaginationPrevBtn onClick={pagePrevHandler} disabled={disablePrevBtn}/>
 		      		{renderPageArr(pageArr)}
-			        <PaginationNextBtn onClick={goNextPage} disabled={dsiableNextBtn}/>
+			        <PaginationNextBtn onClick={pageNextHandler} disabled={dsiableNextBtn}/>
 		      	</div>
 	      	)
 		
@@ -96,13 +92,13 @@ export default class Pagination extends React.Component {
 			let pageArr = this.initPageArr(curPage - 1, 3);
 			paginationContent = (
 				<div className="ui floated right pagination menu small">
-		      		<PaginationPrevBtn onClick={goPrevPage} disabled={disablePrevBtn}/>
-		      		<PaginationNumber onClick={goPage.bind(null, 1)}  number={1}/>
+		      		<PaginationPrevBtn onClick={pagePrevHandler} disabled={disablePrevBtn}/>
+		      		<PaginationNumber onClick={pageByNumberHandler.bind(null, 1)}  number={1}/>
 			        <PaginationEllipsis />
 			        {renderPageArr(pageArr)}
 			        <PaginationEllipsis />
-			        <PaginationNumber onClick={goPage.bind(null, lastPage)} number={lastPage}/>
-			        <PaginationNextBtn onClick={goNextPage} disabled={dsiableNextBtn} />
+			        <PaginationNumber onClick={pageByNumberHandler.bind(null, lastPage)} number={lastPage}/>
+			        <PaginationNextBtn onClick={pageNextHandler} disabled={dsiableNextBtn} />
 		      	</div>
 	      	)
 
@@ -113,11 +109,11 @@ export default class Pagination extends React.Component {
 			let pageArr = this.initPageArr(1, 5);
 			paginationContent = (
 				<div className="ui floated right pagination menu small">
-		      		<PaginationPrevBtn onClick={goPrevPage} disabled={disablePrevBtn}/>
+		      		<PaginationPrevBtn onClick={pagePrevHandler} disabled={disablePrevBtn}/>
 			        {renderPageArr(pageArr)}
 			        <PaginationEllipsis />
-			        <PaginationNumber onClick={goPage.bind(null, lastPage)}  number={lastPage} />    		
-			        <PaginationNextBtn onClick={goNextPage} disabled={dsiableNextBtn} />
+			        <PaginationNumber onClick={pageByNumberHandler.bind(null, lastPage)}  number={lastPage} />    		
+			        <PaginationNextBtn onClick={pageNextHandler} disabled={dsiableNextBtn} />
 		      	</div>
 	      	)
 
@@ -128,15 +124,31 @@ export default class Pagination extends React.Component {
 			let pageArr = this.initPageArr(lastPage - 4, 5);
 			paginationContent = (
 				<div className="ui floated right pagination menu small">
-		      		<PaginationPrevBtn onClick={goPrevPage} disabled={disablePrevBtn}/>
-			        <PaginationNumber onClick={goPage.bind(null, 1)}  number={1} />
+		      		<PaginationPrevBtn onClick={pagePrevHandler} disabled={disablePrevBtn}/>
+			        <PaginationNumber onClick={pageByNumberHandler.bind(null, 1)}  number={1} />
 			        <PaginationEllipsis />		      		
 			        {renderPageArr(pageArr)}		      		
-			        <PaginationNextBtn onClick={goNextPage} disabled={dsiableNextBtn} />
+			        <PaginationNextBtn onClick={pageNextHandler} disabled={dsiableNextBtn} />
 		      	</div>
 	      	)
 		}
 
-		return paginationContent
+		return paginationContent;
 	}
+}
+
+Pagination.propTypes = {
+	curPage: React.PropTypes.number,
+	totalPage: React.PropTypes.number,
+	pageNextHandler: React.PropTypes.func,
+	pagePrevHandler: React.PropTypes.func,
+	pageByNumberHandler: React.PropTypes.func
+}
+
+Pagination.defaultProps = {
+	curPage: 1,
+	totalPage: 1,
+	pagePrevHandler: new Function,
+	pagePrevHandler: new Function,
+	pageByNumberHandler: new Function
 }

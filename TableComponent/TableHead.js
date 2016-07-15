@@ -85,7 +85,7 @@ export default class TableHead extends React.Component {
 
 TableHead.propTypes = {
 	columnName: React.PropTypes.object,
-	columnOrder: React.PropTypes.array,
+	columnOrder: React.PropTypes.array.isRequired,
 	enableRowSelect: React.PropTypes.bool,
 	enableSort: React.PropTypes.bool,
 	data: React.PropTypes.array,

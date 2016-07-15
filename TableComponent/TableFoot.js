@@ -3,29 +3,48 @@ import Pagination from './Pagination';
 
 export default class TableFoot extends React.Component {
 	render = () => {
-		const enableRowSelect = this.props.enableRowSelect;
-		const columnLength = this.props.columnLength + (enableRowSelect? 1: 0);
-		const totalPage = this.props.totalPage;
-		const curPage = this.props.curPage;
-
-		let goNextPage = this.props.onNextPage;
-		let goPrevPage = this.props.onPrevPage;
-		let goPage = this.props.onPage;
-
+		let columnLength = this.props.columnLength + (this.props.enableRowSelect? 1: 0);
 		return (
 			<tfoot>
 				<tr>
 					<th colSpan={columnLength}>
-						<Pagination
-							goNextPage={goNextPage}
-							goPrevPage={goPrevPage}
-							goPage={goPage}
-							totalPage={totalPage}
-							curPage={curPage}
-						/>
+					{
+						this.props.enablePagination
+						? (
+							<Pagination
+								onPagePrev={this.props.pagePrevHandler}
+								onPageNext={this.props.pageNextHandler}
+								onPageByNumber={this.props.pageByNumberHandler}
+								totalPage={totalPage}
+								curPage={curPage}
+							/>
+						)
+						: ''
+					}
 					</th>
 				</tr>
 			</tfoot>
 		)
 	}
+}
+
+TableFoot.propTypes = {
+	enableRowSelect: React.PropTypes.bool,
+	columnLength: React.PropTypes.number.isRequired,
+	enablePagination: React.PropTypes.bool,
+	totalPage: React.PropTypes.number,
+	curPage: React.PropTypes.number,
+	pagePrevHandler: React.PropTypes.func,
+	pageNextHandler: React.PropTypes.func,
+	pageByNumberHandler: React.PropTypes.func
+}
+
+TableFoot.defaultProps = {
+	enablePagination: false,
+	enableRowSelect: false,
+	totalPage: 1,
+	curPage: 1,
+	pageNextHandler: new Function,
+	pagePrevHandler: new Function,
+	pageByNumberHandler: new Function
 }
