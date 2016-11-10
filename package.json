@@ -7,7 +7,7 @@
     "babel-preset-stage-1": "^6.5.0"
   },
   "dependencies": {
-    "blueimp-md5": "^2.3.0",
+    "immutable": "^3.8.1",
     "pubsub-js": "^1.5.3",
     "react": "^15.1.0",
     "react-dom": "^15.1.0",
